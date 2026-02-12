@@ -5,6 +5,7 @@ class GildedRose(object):
     AGED_BRIE = "Aged Brie"
     BACKSTAGE_PASSES = "Backstage passes to a TAFKAL80ETC concert"
     SULFURAS = "Sulfuras, Hand of Ragnaros"
+    CONJURED_PREFIX = "Conjured"
 
     def __init__(self, items):
         self.items = items
@@ -21,8 +22,13 @@ class GildedRose(object):
             self._update_aged_brie(item)
         elif item.name == self.BACKSTAGE_PASSES:
             self._update_backstage_passes(item)
+        elif self._is_conjured(item):
+            self._update_conjured(item)
         else:
             self._update_normal(item)
+
+    def _is_conjured(self, item):
+        return item.name.startswith(self.CONJURED_PREFIX)
 
     def _update_aged_brie(self, item):
         self._increase_quality(item, 1)
@@ -42,6 +48,12 @@ class GildedRose(object):
         self._decrease_quality(item, 1)
         if item.sell_in < 0:
             self._decrease_quality(item, 1)
+
+    def _update_conjured(self, item):
+        """Conjured items degrade in Quality twice as fast as normal items."""
+        self._decrease_quality(item, 2)
+        if item.sell_in < 0:
+            self._decrease_quality(item, 2)
 
     def _increase_quality(self, item, amount):
         item.quality = min(50, item.quality + amount)
